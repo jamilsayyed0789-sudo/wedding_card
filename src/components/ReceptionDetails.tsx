@@ -54,8 +54,8 @@ export default function ReceptionDetails() {
               <h3 className="font-serif text-2xl text-purple-gradient font-light uppercase">
                 {invitationConfig.event.time}
               </h3>
-              <p className="text-xs tracking-wider text-[#6B5B6B]/70 mt-2">
-                Evening Dinner &amp; Celebrations
+              <p className="text-sm tracking-wider text-[#6B5B6B]/70 mt-3 font-medium">
+                Afternoon Lunch &amp; Celebrations
               </p>
             </div>
           </motion.div>
