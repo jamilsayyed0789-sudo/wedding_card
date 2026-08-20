@@ -29,12 +29,16 @@ export default function InvitationReveal() {
 
     // Start auto-scrolling after a 3 second delay to let them see the Hero section
     const startTimeout = setTimeout(() => {
+      // Temporarily disable smooth scrolling on the html element
+      document.documentElement.style.scrollBehavior = 'auto';
+      
       const scrollStep = () => {
         if (!isUserInteracting) {
-          window.scrollBy({ top: 1, behavior: "auto" }); // Scroll down by 1px
+          window.scrollBy({ top: 1, left: 0, behavior: "instant" as ScrollBehavior });
           
           // Check if we reached the bottom
           if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 5) {
+             document.documentElement.style.scrollBehavior = ''; // Restore
              return;
           }
           
@@ -47,9 +51,12 @@ export default function InvitationReveal() {
 
     // Event listeners to stop auto-scroll if the user wants to take control
     const stopScroll = () => {
-      setIsUserInteracting(true);
-      if (scrollRef.current) {
-        cancelAnimationFrame(scrollRef.current);
+      if (!isUserInteracting) {
+        setIsUserInteracting(true);
+        document.documentElement.style.scrollBehavior = ''; // Restore smooth scrolling
+        if (scrollRef.current) {
+          cancelAnimationFrame(scrollRef.current);
+        }
       }
     };
 
