@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import { invitationConfig } from "@/config/invitation";
 import { Sparkles } from "lucide-react";
 
@@ -9,6 +9,19 @@ export default function ScratchCard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isRevealed, setIsRevealed] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
+  
+  const containerRef = useRef<HTMLElement>(null);
+  const isInView = useInView(containerRef, { once: true, amount: 0.5 });
+
+  // Auto-reveal when scrolled into view
+  useEffect(() => {
+    if (isInView && !isRevealed) {
+      const timer = setTimeout(() => {
+        setIsRevealed(true);
+      }, 1500); // 1.5 second delay before it magically reveals itself
+      return () => clearTimeout(timer);
+    }
+  }, [isInView, isRevealed]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -137,13 +150,13 @@ export default function ScratchCard() {
   };
 
   return (
-    <section className="relative py-12 px-6 max-w-lg mx-auto text-center flex flex-col items-center">
+    <section ref={containerRef} className="relative py-12 px-6 max-w-lg mx-auto text-center flex flex-col items-center">
       <div className="mb-8">
         <p className="text-xs uppercase tracking-[0.35em] text-[#9B51E0] font-medium mb-2">
           SAVE THE DATE
         </p>
         <h3 className="font-serif text-2xl tracking-[0.1em] text-purple-gradient font-light uppercase">
-          REVEAL THE BIG DAY
+          MARK YOUR CALENDAR
         </h3>
       </div>
 
@@ -187,9 +200,9 @@ export default function ScratchCard() {
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-6 text-sm text-[#9B51E0] font-medium tracking-wide animate-pulse"
+            className="mt-6 text-sm text-[#9B51E0] font-medium tracking-wide"
           >
-            Mark your calendars!
+            Looking forward to seeing you!
           </motion.p>
         )}
       </AnimatePresence>
