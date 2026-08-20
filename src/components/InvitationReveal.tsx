@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PageLoader from "./PageLoader";
 import OpeningScreen from "./OpeningScreen";
@@ -21,6 +21,52 @@ import FallingEffects from "./FallingEffects";
 export default function InvitationReveal() {
   const [isOpen, setIsOpen] = useState(false);
   const [autoMusic, setAutoMusic] = useState(false);
+  const scrollRef = useRef<number | null>(null);
+  const [isUserInteracting, setIsUserInteracting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || isUserInteracting) return;
+
+    // Start auto-scrolling after a 3 second delay to let them see the Hero section
+    const startTimeout = setTimeout(() => {
+      const scrollStep = () => {
+        if (!isUserInteracting) {
+          window.scrollBy({ top: 1, behavior: "auto" }); // Scroll down by 1px
+          
+          // Check if we reached the bottom
+          if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 5) {
+             return;
+          }
+          
+          scrollRef.current = requestAnimationFrame(scrollStep);
+        }
+      };
+      
+      scrollRef.current = requestAnimationFrame(scrollStep);
+    }, 3000);
+
+    // Event listeners to stop auto-scroll if the user wants to take control
+    const stopScroll = () => {
+      setIsUserInteracting(true);
+      if (scrollRef.current) {
+        cancelAnimationFrame(scrollRef.current);
+      }
+    };
+
+    window.addEventListener("wheel", stopScroll, { passive: true });
+    window.addEventListener("touchstart", stopScroll, { passive: true });
+    window.addEventListener("mousedown", stopScroll, { passive: true });
+    window.addEventListener("keydown", stopScroll, { passive: true });
+
+    return () => {
+      clearTimeout(startTimeout);
+      if (scrollRef.current) cancelAnimationFrame(scrollRef.current);
+      window.removeEventListener("wheel", stopScroll);
+      window.removeEventListener("touchstart", stopScroll);
+      window.removeEventListener("mousedown", stopScroll);
+      window.removeEventListener("keydown", stopScroll);
+    };
+  }, [isOpen, isUserInteracting]);
 
   const handleOpenInvitation = () => {
     setIsOpen(true);
